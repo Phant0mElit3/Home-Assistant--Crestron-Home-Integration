@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Treats generic Quick Action API-description responses as inconclusive and
+  continues trying alternate recall endpoint candidates.
+
 ## 0.1.2
 
 - Adds experimental Home Assistant button entities for Crestron Home Quick

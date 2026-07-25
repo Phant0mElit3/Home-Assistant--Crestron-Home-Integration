@@ -216,6 +216,14 @@ class CrestronHomeApi:
                 path,
                 payload,
             )
+            if _is_generic_api_description(payload):
+                _LOGGER.debug(
+                    "Crestron Home quick action POST %s returned generic API "
+                    "description; trying next candidate",
+                    path,
+                )
+                errors.append(f"{path}: generic API description")
+                continue
             self._raise_for_command_status(
                 payload,
                 f"Quick action {quick_action_id} failed to recall",
@@ -481,3 +489,16 @@ def _schedule_mode_candidates(mode: str) -> list[str]:
         if candidate not in result:
             result.append(candidate)
     return result
+
+
+def _is_generic_api_description(payload: dict[str, Any]) -> bool:
+    """Return whether a response is the generic API landing payload."""
+    keys = set(payload)
+    description = str(payload.get("description", "")).lower()
+    return (
+        "status" not in payload
+        and "description" in payload
+        and "version" in payload
+        and keys <= {"description", "version"}
+        and "pyng rest api" in description
+    )
