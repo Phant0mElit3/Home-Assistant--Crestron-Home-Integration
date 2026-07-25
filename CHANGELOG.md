@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Treats Quick Action inventory/list responses as inconclusive instead of
+  command success.
+
 ## 0.1.4
 
 - Adds body-based Quick Action command candidates and detailed Quick Action

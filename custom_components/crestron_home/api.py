@@ -248,6 +248,15 @@ class CrestronHomeApi:
                 )
                 errors.append(f"{path} payload={request_payload}: generic API description")
                 continue
+            if _is_quick_action_listing(payload):
+                _LOGGER.debug(
+                    "Crestron Home quick action POST %s payload=%s returned "
+                    "quick action listing; trying next candidate",
+                    path,
+                    request_payload,
+                )
+                errors.append(f"{path} payload={request_payload}: quick action listing")
+                continue
             self._raise_for_command_status(
                 payload,
                 f"Quick action {quick_action_id} failed to recall",
@@ -525,6 +534,15 @@ def _is_generic_api_description(payload: dict[str, Any]) -> bool:
         and "version" in payload
         and keys <= {"description", "version"}
         and "pyng rest api" in description
+    )
+
+
+def _is_quick_action_listing(payload: dict[str, Any]) -> bool:
+    """Return whether a response is just the quick action inventory payload."""
+    return (
+        "status" not in payload
+        and isinstance(payload.get("quickActions"), list)
+        and "version" in payload
     )
 
 
