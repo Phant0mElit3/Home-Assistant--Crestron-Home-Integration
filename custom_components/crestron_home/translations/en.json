@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Crestron Home",
+        "description": "Connect to a Crestron Home processor using the Web API authentication token.",
+        "data": {
+          "host": "Processor host or IP",
+          "token": "Web API authentication token",
+          "use_ssl": "Use HTTPS",
+          "verify_ssl": "Verify SSL certificate",
+          "scan_interval": "Polling interval in seconds"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Polling interval in seconds"
+        }
+      }
+    }
+  }
+}
