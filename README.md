@@ -10,7 +10,12 @@ it as a custom HACS repository until more systems have been tested.
 
 1. In Home Assistant, open HACS.
 2. Open the three-dot menu and choose **Custom repositories**.
-3. Add this repository URL.
+3. Add this repository URL:
+
+   ```text
+   https://github.com/Phant0mElit3/Home-Assistant--Crestron-Home-Integration
+   ```
+
 4. Select category **Integration**.
 5. Install **Crestron Home**.
 6. Restart Home Assistant.

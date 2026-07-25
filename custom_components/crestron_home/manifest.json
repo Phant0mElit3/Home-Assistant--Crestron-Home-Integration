@@ -1,12 +1,12 @@
 {
   "domain": "crestron_home",
   "name": "Crestron Home",
-  "codeowners": ["@isaackrueger"],
+  "codeowners": ["@Phant0mElit3"],
   "config_flow": true,
-  "documentation": "https://github.com/isaackrueger/ha-crestron-home",
-  "issue_tracker": "https://github.com/isaackrueger/ha-crestron-home/issues",
+  "documentation": "https://github.com/Phant0mElit3/Home-Assistant--Crestron-Home-Integration",
+  "issue_tracker": "https://github.com/Phant0mElit3/Home-Assistant--Crestron-Home-Integration/issues",
   "integration_type": "hub",
   "iot_class": "local_polling",
   "requirements": [],
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

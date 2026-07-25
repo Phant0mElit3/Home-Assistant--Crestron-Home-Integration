@@ -2,6 +2,12 @@
 
 Local polling integration for Crestron Home OS using the documented REST API.
 
+Repository:
+
+```text
+https://github.com/Phant0mElit3/Home-Assistant--Crestron-Home-Integration
+```
+
 ## Confirmed Authentication Flow
 
 1. `GET /cws/api/login` with:
