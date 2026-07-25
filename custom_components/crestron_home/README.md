@@ -39,6 +39,8 @@ crestron_home:
   `/securitydevices`
 - `binary_sensor`: occupancy, door/contact, doorbell, and similar sensor state
   from `/sensors` and sensor devices from `/devices`
+- `button`: discovered Quick Actions from `/quickactions`; press support is
+  experimental while the recall endpoint is validated against live systems
 - `light`: polled state from `/lights`; on/off and dimmer control through
   `/lights/SetState`
 - `climate`: polled thermostat state from `/thermostats`; setpoint, HVAC mode,
@@ -56,9 +58,9 @@ crestron_home:
 - `sensor`: numeric or diagnostic sensor values such as light level,
   temperature, humidity, and battery status
 
-The integration also polls `/quickactions` for future support. The published
-Crestron REST docs expose Quick Actions as a listing endpoint only, so this
-build does not create pressable HA buttons for them yet.
+The published Crestron REST docs expose Quick Actions as a listing endpoint
+only, so button presses try the most likely recall/execute endpoint patterns and
+log each attempt for validation.
 
 Binary sensors are read-only by nature. AV-room control still belongs to the
 separate User Interface Device Password / port `50001` surface.

@@ -4,6 +4,9 @@
 
 - Adds Home Assistant/HACS brand images for the Crestron Home integration.
 - Updates integration metadata to point at the public GitHub repository.
+- Adds experimental Home Assistant button entities for Crestron Home Quick
+  Actions discovered from `/quickactions`.
+- Adds live-test logging for likely Quick Action recall endpoint candidates.
 
 ## 0.1.0
 

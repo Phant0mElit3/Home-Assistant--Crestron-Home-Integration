@@ -57,6 +57,7 @@ HTTP `80`.
 - Door locks from `/doorlocks`
 - Media rooms from `/mediarooms`
 - Media room source selects
+- Quick Actions as experimental buttons from `/quickactions`
 - Sensors and binary sensors from `/sensors` and `/devices`
 - Read-only security device state from `/securitydevices`
 
@@ -69,8 +70,9 @@ HTTP `80`.
 - Thermostat fan and scheduler commands are exposed because the REST API
   documents them, but more live systems are needed to validate behavior across
   thermostat models.
-- Quick Actions are polled for future support but are not exposed as buttons
-  until a documented execute endpoint is confirmed.
+- Quick Action buttons are experimental because the public REST docs expose
+  discovery but do not document the recall endpoint. Button presses try the
+  most likely Crestron command paths and log each attempt for live validation.
 
 ## Crestron API
 

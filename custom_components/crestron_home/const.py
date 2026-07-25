@@ -15,6 +15,7 @@ DEFAULT_SCAN_INTERVAL = timedelta(seconds=15)
 PLATFORMS = [
     "alarm_control_panel",
     "binary_sensor",
+    "button",
     "climate",
     "cover",
     "light",

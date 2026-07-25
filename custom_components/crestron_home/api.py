@@ -30,6 +30,13 @@ OPTIONAL_INVENTORY_ENDPOINTS = {
     "securitydevices",
     "quickactions",
 }
+QUICK_ACTION_RECALL_PATHS = (
+    "/quickactions/recall/{id}",
+    "/quickactions/{id}/recall",
+    "/quickactions/execute/{id}",
+    "/quickactions/{id}/execute",
+    "/quickactions/{id}",
+)
 
 
 class CrestronHomeApiError(Exception):
@@ -185,6 +192,40 @@ class CrestronHomeApi:
         payload = await self.async_post(f"/scenes/recall/{scene_id}")
         self._raise_for_command_status(payload, f"Scene {scene_id} failed to recall")
         return payload
+
+    async def async_recall_quick_action(self, quick_action_id: Any) -> dict[str, Any]:
+        """Recall a Crestron Home quick action.
+
+        Crestron documents quick action discovery but not the recall endpoint.
+        Try scene-like and execute-like routes so live processor logs can
+        identify the supported command surface.
+        """
+        errors: list[str] = []
+        for template in QUICK_ACTION_RECALL_PATHS:
+            path = template.format(id=quick_action_id)
+            _LOGGER.debug("Trying Crestron Home quick action POST %s", path)
+            try:
+                payload = await self.async_post(path)
+            except CrestronHomeApiError as err:
+                _LOGGER.debug("Crestron Home quick action POST %s failed: %s", path, err)
+                errors.append(f"{path}: {err}")
+                continue
+            _LOGGER.debug(
+                "Crestron Home quick action response for %s via %s: %s",
+                quick_action_id,
+                path,
+                payload,
+            )
+            self._raise_for_command_status(
+                payload,
+                f"Quick action {quick_action_id} failed to recall",
+            )
+            return payload
+
+        raise CrestronHomeApiError(
+            f"Quick action {quick_action_id} failed to recall; attempted "
+            + "; ".join(errors)
+        )
 
     async def async_set_shade_position(
         self,
