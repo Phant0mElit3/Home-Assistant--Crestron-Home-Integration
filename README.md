@@ -32,7 +32,7 @@ The integration supports UI setup and YAML import.
 
 ```yaml
 crestron_home:
-  host: 192.168.1.229
+  host: 'processors IP Addess'
   token: !secret crestron_home_token
   use_ssl: true
   verify_ssl: false
