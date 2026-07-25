@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Adds body-based Quick Action command candidates and detailed Quick Action
+  payload diagnostics for live endpoint discovery.
+
 ## 0.1.3
 
 - Treats generic Quick Action API-description responses as inconclusive and

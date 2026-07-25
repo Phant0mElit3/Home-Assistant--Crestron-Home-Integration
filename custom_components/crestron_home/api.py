@@ -30,12 +30,24 @@ OPTIONAL_INVENTORY_ENDPOINTS = {
     "securitydevices",
     "quickactions",
 }
-QUICK_ACTION_RECALL_PATHS = (
-    "/quickactions/recall/{id}",
-    "/quickactions/{id}/recall",
-    "/quickactions/execute/{id}",
-    "/quickactions/{id}/execute",
-    "/quickactions/{id}",
+QUICK_ACTION_RECALL_ATTEMPTS = (
+    ("/quickactions/recall", {"quickActions": [{"id": "{id}"}]}),
+    ("/quickactions/recall", {"quickactions": [{"id": "{id}"}]}),
+    ("/quickactions/recall", {"actions": [{"id": "{id}"}]}),
+    ("/quickactions/recall", {"id": "{id}"}),
+    ("/quickactions/execute", {"quickActions": [{"id": "{id}"}]}),
+    ("/quickactions/execute", {"quickactions": [{"id": "{id}"}]}),
+    ("/quickactions/execute", {"actions": [{"id": "{id}"}]}),
+    ("/quickactions/execute", {"id": "{id}"}),
+    ("/quickactions", {"quickActions": [{"id": "{id}"}]}),
+    ("/quickactions", {"quickactions": [{"id": "{id}"}]}),
+    ("/quickactions", {"actions": [{"id": "{id}"}]}),
+    ("/quickactions", {"id": "{id}"}),
+    ("/quickactions/recall/{id}", None),
+    ("/quickactions/{id}/recall", None),
+    ("/quickactions/execute/{id}", None),
+    ("/quickactions/{id}/execute", None),
+    ("/quickactions/{id}", None),
 )
 
 
@@ -201,28 +213,40 @@ class CrestronHomeApi:
         identify the supported command surface.
         """
         errors: list[str] = []
-        for template in QUICK_ACTION_RECALL_PATHS:
+        for template, body_template in QUICK_ACTION_RECALL_ATTEMPTS:
             path = template.format(id=quick_action_id)
-            _LOGGER.debug("Trying Crestron Home quick action POST %s", path)
+            request_payload = _format_quick_action_payload(body_template, quick_action_id)
+            _LOGGER.debug(
+                "Trying Crestron Home quick action POST %s payload=%s",
+                path,
+                request_payload,
+            )
             try:
-                payload = await self.async_post(path)
+                payload = await self.async_post(path, request_payload)
             except CrestronHomeApiError as err:
-                _LOGGER.debug("Crestron Home quick action POST %s failed: %s", path, err)
-                errors.append(f"{path}: {err}")
+                _LOGGER.debug(
+                    "Crestron Home quick action POST %s payload=%s failed: %s",
+                    path,
+                    request_payload,
+                    err,
+                )
+                errors.append(f"{path} payload={request_payload}: {err}")
                 continue
             _LOGGER.debug(
-                "Crestron Home quick action response for %s via %s: %s",
+                "Crestron Home quick action response for %s via %s payload=%s: %s",
                 quick_action_id,
                 path,
+                request_payload,
                 payload,
             )
             if _is_generic_api_description(payload):
                 _LOGGER.debug(
-                    "Crestron Home quick action POST %s returned generic API "
-                    "description; trying next candidate",
+                    "Crestron Home quick action POST %s payload=%s returned "
+                    "generic API description; trying next candidate",
                     path,
+                    request_payload,
                 )
-                errors.append(f"{path}: generic API description")
+                errors.append(f"{path} payload={request_payload}: generic API description")
                 continue
             self._raise_for_command_status(
                 payload,
@@ -502,3 +526,19 @@ def _is_generic_api_description(payload: dict[str, Any]) -> bool:
         and keys <= {"description", "version"}
         and "pyng rest api" in description
     )
+
+
+def _format_quick_action_payload(payload: Any, quick_action_id: Any) -> Any:
+    """Replace id placeholders in a quick action command payload template."""
+    if payload is None:
+        return None
+    if isinstance(payload, dict):
+        return {
+            key: _format_quick_action_payload(value, quick_action_id)
+            for key, value in payload.items()
+        }
+    if isinstance(payload, list):
+        return [_format_quick_action_payload(value, quick_action_id) for value in payload]
+    if payload == "{id}":
+        return quick_action_id
+    return payload

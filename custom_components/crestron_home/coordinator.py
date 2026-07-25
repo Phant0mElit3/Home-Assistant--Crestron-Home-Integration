@@ -136,6 +136,14 @@ class CrestronHomeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 raw_source_keys(media_room),
                 source_map(media_room),
             )
+        for quickaction in quickactions:
+            _LOGGER.debug(
+                "Crestron Home quick action diagnostics: id=%s name=%s keys=%s payload=%s",
+                quickaction.get("id"),
+                quickaction.get("name"),
+                sorted(str(key) for key in quickaction),
+                quickaction,
+            )
         for thermostat in thermostats:
             _LOGGER.debug(
                 "Crestron Home thermostat diagnostics: id=%s name=%s keys=%s "
