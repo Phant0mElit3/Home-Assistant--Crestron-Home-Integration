@@ -26,7 +26,7 @@ https://github.com/Phant0mElit3/Home-Assistant--Crestron-Home-Integration
 
 ```yaml
 crestron_home:
-  host: 192.168.1.229
+  host: "processor IP address"
   token: !secret crestron_home_token
   use_ssl: true
   verify_ssl: false
