@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/header.png" alt="Crestron Home for Home Assistant" width="720">
+</p>
+
 # Crestron Home for Home Assistant
 
 Local polling Home Assistant integration for Crestron Home processors using the
