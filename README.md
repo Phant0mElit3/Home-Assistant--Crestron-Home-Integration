@@ -41,7 +41,7 @@ The integration supports UI setup and YAML import.
 
 ```yaml
 crestron_home:
-  host: 'processors IP Addess'
+  host: "processor IP address"
   token: !secret crestron_home_token
   use_ssl: true
   verify_ssl: false
@@ -83,3 +83,18 @@ HTTP `80`.
 Crestron Home REST API reference:
 
 https://sdkcon78221.crestron.com/sdk/Crestron-Home-API/Content/Topics/API-Reference/API-Reference.htm
+
+## Trademark and Asset Notice
+
+This project is an independent Home Assistant custom integration and is not
+affiliated with, endorsed by, sponsored by, or supported by Crestron Electronics,
+Inc.
+
+Crestron, Crestron Home, and related names, marks, logos, and images are the
+property of Crestron Electronics, Inc. Any Crestron logos or product images in
+this repository are included only to identify compatibility with Crestron Home
+systems and are not owned by this project. The MIT license applies to the
+original integration source code only and does not grant rights to Crestron
+trademarks, logos, images, or other third-party assets.
+
+See [NOTICE](NOTICE) for the asset and trademark notice.
