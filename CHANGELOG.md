@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.7
+
+- Removes personal details and local network examples from public docs.
+
 ## 0.1.6
 
 - Adds an MIT license file for HACS repository validation.
