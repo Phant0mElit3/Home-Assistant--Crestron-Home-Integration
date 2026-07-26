@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6
+
+- Adds an MIT license file for HACS repository validation.
+
 ## 0.1.5
 
 - Treats Quick Action inventory/list responses as inconclusive instead of
