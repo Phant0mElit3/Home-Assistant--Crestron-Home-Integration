@@ -62,5 +62,6 @@ The published Crestron REST docs expose Quick Actions as a listing endpoint
 only, so button presses try the most likely recall/execute endpoint patterns and
 log each attempt for validation.
 
-Binary sensors are read-only by nature. AV-room control still belongs to the
-separate User Interface Device Password / port `50001` surface.
+Binary sensors are read-only by nature. 
+
+This integration currently uses the Crestron Home Web API token over the default HTTP/HTTPS ports. Josh.ai documentation indicates that deeper AV-room control may use a separate User Interface Device Password on port 50001; that interface is not implemented yet.
