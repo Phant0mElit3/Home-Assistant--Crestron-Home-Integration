@@ -63,11 +63,14 @@ class CrestronHomeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         shades = _extract_items(inventory.get("shades"), "shades")
         thermostats = _extract_items(inventory.get("thermostats"), "thermostats")
         scenes = _extract_items(inventory.get("scenes"), "scenes")
-        doorlocks = _extract_items(
-            inventory.get("doorlocks"),
-            "doorLocks",
-            "doorlocks",
-            "locks",
+        doorlocks = _merge_by_id(
+            [device for device in devices if _is_lock_device(device)],
+            _extract_items(
+                inventory.get("doorlocks"),
+                "doorLocks",
+                "doorlocks",
+                "locks",
+            ),
         )
         mediarooms = _extract_items(
             inventory.get("mediarooms"),
@@ -217,6 +220,17 @@ def _is_binary_sensor(item: dict[str, Any]) -> bool:
         }:
             return True
     return False
+
+
+def _is_lock_device(item: dict[str, Any]) -> bool:
+    """Return whether a generic Crestron device payload looks like a door lock."""
+    device_type = str(item.get("type", "")).replace(" ", "").lower()
+    subtype = str(item.get("subType", "")).replace(" ", "").lower()
+    return device_type in {"lock", "doorlock", "doorlocks"} or subtype in {
+        "lock",
+        "doorlock",
+        "doorlocks",
+    }
 
 
 def _sensor_entities(sensors: list[dict[str, Any]]) -> list[dict[str, Any]]:
