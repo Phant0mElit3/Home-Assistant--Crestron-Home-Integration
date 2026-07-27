@@ -165,12 +165,11 @@ class CrestronHomeThermostat(CrestronHomeEntity, ClimateEntity):
 
     @property
     def fan_modes(self) -> list[str]:
-        """Return documented fan modes plus the active value if different."""
-        modes = [
-            mode
-            for mode in DOCUMENTED_FAN_MODES
-            if self._has_available_option(mode, self.item.get("availableFanModes") or [])
-        ]
+        """Return available Crestron fan modes."""
+        available_modes = self.item.get("availableFanModes") or []
+        modes = [str(mode) for mode in available_modes if mode is not None]
+        if not modes:
+            modes = list(DOCUMENTED_FAN_MODES)
         fan_mode = self._polled_fan_mode
         if fan_mode is not None and fan_mode not in modes:
             modes.append(fan_mode)
@@ -194,8 +193,11 @@ class CrestronHomeThermostat(CrestronHomeEntity, ClimateEntity):
 
     @property
     def preset_modes(self) -> list[str]:
-        """Return documented schedule modes plus the active value if different."""
-        modes = list(DOCUMENTED_PRESET_MODES)
+        """Return available schedule modes plus documented fallback values."""
+        available_modes = self.item.get("availableSchedulerStates") or []
+        modes = [str(mode) for mode in available_modes if mode is not None]
+        if not modes:
+            modes = list(DOCUMENTED_PRESET_MODES)
         preset_mode = self._polled_preset_mode
         if preset_mode is not None and preset_mode not in modes:
             modes.append(preset_mode)
@@ -291,8 +293,12 @@ class CrestronHomeThermostat(CrestronHomeEntity, ClimateEntity):
         mode = REVERSE_MODE_MAP.get(hvac_mode)
         if mode is None:
             raise HomeAssistantError(f"Unsupported Crestron Home HVAC mode: {hvac_mode}")
+        crestron_mode = self._crestron_option_value(
+            mode,
+            self.item.get("availableSystemModes") or [],
+        )
         try:
-            await self.coordinator.api.async_set_thermostat_mode(self._id, mode)
+            await self.coordinator.api.async_set_thermostat_mode(self._id, crestron_mode)
         except CrestronHomeApiError as err:
             raise HomeAssistantError(f"Crestron Home thermostat mode failed: {err}") from err
         self._set_optimistic_value("hvac_mode", hvac_mode)
@@ -315,7 +321,7 @@ class CrestronHomeThermostat(CrestronHomeEntity, ClimateEntity):
         """Set fan mode."""
         crestron_fan_mode = self._crestron_option_value(
             fan_mode,
-            list(DOCUMENTED_FAN_MODES),
+            self.item.get("availableFanModes") or list(DOCUMENTED_FAN_MODES),
         )
         try:
             await self.coordinator.api.async_set_thermostat_fan_mode(self._id, crestron_fan_mode)
@@ -332,7 +338,7 @@ class CrestronHomeThermostat(CrestronHomeEntity, ClimateEntity):
         """Set schedule preset."""
         crestron_preset_mode = self._crestron_option_value(
             preset_mode,
-            list(DOCUMENTED_PRESET_MODES),
+            self.item.get("availableSchedulerStates") or list(DOCUMENTED_PRESET_MODES),
         )
         try:
             await self.coordinator.api.async_set_thermostat_schedule(self._id, crestron_preset_mode)

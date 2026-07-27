@@ -312,7 +312,7 @@ class CrestronHomeApi:
         """Set a Crestron Home thermostat operating mode."""
         payload = await self.async_post(
             "/thermostats/mode",
-            {"thermostats": [{"id": thermostat_id, "mode": mode.upper()}]},
+            {"thermostats": [{"id": thermostat_id, "mode": mode}]},
         )
         self._raise_for_command_status(
             payload,
@@ -326,7 +326,7 @@ class CrestronHomeApi:
         mode: str,
     ) -> dict[str, Any]:
         """Set a Crestron Home thermostat fan mode."""
-        request_payload = {"thermostats": [{"id": thermostat_id, "mode": mode.upper()}]}
+        request_payload = {"thermostats": [{"id": thermostat_id, "mode": mode}]}
         _LOGGER.debug("Setting Crestron Home thermostat fan mode: %s", request_payload)
         payload = await self.async_post(
             "/thermostats/fanmode",
@@ -516,7 +516,7 @@ class CrestronHomeApi:
 
 def _schedule_mode_candidates(mode: str) -> list[str]:
     """Return scheduler command values to try for firmware case differences."""
-    candidates = (mode.upper(), mode.title())
+    candidates = (mode, mode.upper(), mode.title())
     result: list[str] = []
     for candidate in candidates:
         if candidate not in result:
