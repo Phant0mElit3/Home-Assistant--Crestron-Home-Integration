@@ -10,6 +10,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import CrestronHomeCoordinator
 
+ROOM_ID_KEYS = ("roomId", "roomID", "room_id", "room")
+ROOM_NAME_KEYS = ("roomName", "room name", "area", "areaName")
+
 
 class CrestronHomeEntity(CoordinatorEntity[CrestronHomeCoordinator]):
     """Base class for Crestron Home entities."""
@@ -51,27 +54,66 @@ class CrestronHomeEntity(CoordinatorEntity[CrestronHomeCoordinator]):
         return status in (None, "online")
 
     @property
+    def suggested_area(self) -> str | None:
+        """Return the Home Assistant suggested area from the Crestron room."""
+        return self.room_name
+
+    @property
+    def room_id(self) -> Any:
+        """Return the Crestron room id for this entity."""
+        item = self.item
+        for key in ROOM_ID_KEYS:
+            value = item.get(key)
+            if isinstance(value, dict):
+                room_id = value.get("id", value.get("roomId"))
+                if room_id is not None:
+                    return room_id
+            elif value is not None:
+                return value
+        return None
+
+    @property
+    def room_info(self) -> dict[str, Any]:
+        """Return the Crestron room payload for this entity."""
+        room_id = self.room_id
+        rooms_by_id = self.coordinator.data.get("rooms_by_id", {})
+        return rooms_by_id.get(room_id) or rooms_by_id.get(str(room_id)) or {}
+
+    @property
+    def room_name(self) -> str | None:
+        """Return the Crestron room name for this entity."""
+        room = self.room_info
+        for key in ("name", *ROOM_NAME_KEYS):
+            value = room.get(key)
+            if value:
+                return str(value)
+        item = self.item
+        for key in ROOM_NAME_KEYS:
+            value = item.get(key)
+            if value:
+                return str(value)
+        return None
+
+    @property
     def device_info(self) -> DeviceInfo:
         """Return device registry information."""
         item = self.item
-        room = self.coordinator.data.get("rooms_by_id", {}).get(item.get("roomId"), {})
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._id))},
             name=item.get("name"),
             manufacturer="Crestron",
             model=item.get("type") or item.get("subType") or "Crestron Home Device",
-            suggested_area=room.get("name"),
+            suggested_area=self.room_name,
         )
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return common Crestron attributes."""
         item = self.item
-        room = self.coordinator.data.get("rooms_by_id", {}).get(item.get("roomId"), {})
         return {
             "crestron_id": self._id,
-            "room_id": item.get("roomId"),
-            "room_name": room.get("name"),
+            "room_id": self.room_id,
+            "room_name": self.room_name,
             "connection_status": item.get("connectionStatus"),
             "sub_type": item.get("subType"),
         }

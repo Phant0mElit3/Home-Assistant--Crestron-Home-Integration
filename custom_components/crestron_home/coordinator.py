@@ -99,7 +99,7 @@ class CrestronHomeCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         data = {
             "rooms": rooms,
-            "rooms_by_id": {room.get("id"): room for room in rooms},
+            "rooms_by_id": _rooms_by_id(rooms),
             "devices": devices,
             "lights": lights,
             "shades": shades,
@@ -181,6 +181,20 @@ def _extract_items(payload: Any, *keys: str) -> list[dict[str, Any]]:
         if isinstance(value, list):
             return [item for item in value if isinstance(item, dict)]
     return []
+
+
+def _rooms_by_id(rooms: list[dict[str, Any]]) -> dict[Any, dict[str, Any]]:
+    """Build a tolerant room lookup for Crestron payload id variations."""
+    rooms_by_id: dict[Any, dict[str, Any]] = {}
+    for room in rooms:
+        room_id = room.get("id", room.get("roomId"))
+        if room_id is None:
+            continue
+        rooms_by_id[room_id] = room
+        rooms_by_id[str(room_id)] = room
+        if isinstance(room_id, str) and room_id.isdigit():
+            rooms_by_id[int(room_id)] = room
+    return rooms_by_id
 
 
 def _merge_by_id(*groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
